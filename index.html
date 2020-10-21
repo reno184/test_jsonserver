@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        ul{list-style: none;padding-left:5px }
+    </style>
+</head>
+<body>
+<fieldset>
+    <legend>Comments</legend>
+    <pre id="result">
+        No data
+    </pre>
+    <form>
+        <label>Comment
+            <input type="text" name="comment">
+        </label>
+        <button type="submit">Valider</button>
+        <br>
+        <small id="error" style="color:#dc1212"></small>
+    </form>
+</fieldset>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script>
+    const url = 'http://localhost:3004';
+    const getDatas = async function(){
+        const rep = await  fetch(url+'/comments');
+        if(rep.ok){
+            const data =  await rep.json()
+            $("#result").removeAttr("style").text(JSON.stringify(data, null, 2));
+        }else{
+            $("#result").attr("style", "color:#dc1212;font-size:.8rem").text(rep.statusText);
+        }
+    }
+    $(document).ready(  function() {
+
+        getDatas();
+        $("form").on("submit", function(e){
+            e.preventDefault()
+
+            fetch(url+'/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ body : this.comment.value })
+            }).then(() => {
+                getDatas();
+            });
+
+        })
+    });
+</script>
+</body>
+</html>
